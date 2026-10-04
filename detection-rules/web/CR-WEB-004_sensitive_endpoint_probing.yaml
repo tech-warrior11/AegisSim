@@ -1,0 +1,39 @@
+id: CR-WEB-004
+name: Sensitive Endpoint Probing & Recon
+description: Detects systematic probing of sensitive administration panels, environment configs, and repository metadata endpoints.
+category: web
+severity: medium
+enabled: true
+
+mitre_attack:
+  tactic: Reconnaissance
+  technique_id: T1595.002
+  technique_name: Vulnerability Scanning
+
+condition:
+  event_type: web
+  action: http_request
+  pattern_match:
+    fields:
+      - raw_message
+      - metadata.url
+    patterns:
+      - "/\\.env"
+      - "/\\.git"
+      - "/wp-login\\.php"
+      - "/phpmyadmin"
+      - "/server-status"
+      - "/actuator"
+      - "/swagger"
+      - "/api/v1/debug"
+
+threshold:
+  count: 3
+  window_minutes: 5
+
+group_by:
+  - source_ip
+  - host
+
+suppression_minutes: 5
+confidence: 0.82

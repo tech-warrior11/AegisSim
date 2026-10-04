@@ -1,0 +1,81 @@
+id: SCENARIO-003
+name: Network Reconnaissance & Port Scanning Simulation
+description: Simulates an automated SYN port scan sweeping common network service ports.
+category: network
+author: AegisSim Red Team Simulator
+severity: medium
+
+target:
+  host: lab-linux-01
+  service: network
+  source_ip: 185.220.101.5
+
+stages:
+  - stage_number: 1
+    name: Port Sweep
+    description: Connecting to multiple target ports sequentially
+    events:
+      - source: zeek
+        host: lab-linux-01
+        event_type: network
+        action: connection_attempt
+        source_ip: 185.220.101.5
+        raw_message: "TCP connection attempt from 185.220.101.5 to lab-linux-01 port 21"
+        metadata:
+          dst_port: 21
+          proto: tcp
+      - source: zeek
+        host: lab-linux-01
+        event_type: network
+        action: connection_attempt
+        source_ip: 185.220.101.5
+        raw_message: "TCP connection attempt from 185.220.101.5 to lab-linux-01 port 22"
+        metadata:
+          dst_port: 22
+          proto: tcp
+      - source: zeek
+        host: lab-linux-01
+        event_type: network
+        action: connection_attempt
+        source_ip: 185.220.101.5
+        raw_message: "TCP connection attempt from 185.220.101.5 to lab-linux-01 port 80"
+        metadata:
+          dst_port: 80
+          proto: tcp
+      - source: zeek
+        host: lab-linux-01
+        event_type: network
+        action: connection_attempt
+        source_ip: 185.220.101.5
+        raw_message: "TCP connection attempt from 185.220.101.5 to lab-linux-01 port 443"
+        metadata:
+          dst_port: 443
+          proto: tcp
+      - source: zeek
+        host: lab-linux-01
+        event_type: network
+        action: connection_attempt
+        source_ip: 185.220.101.5
+        raw_message: "TCP connection attempt from 185.220.101.5 to lab-linux-01 port 3306"
+        metadata:
+          dst_port: 3306
+          proto: tcp
+      - source: zeek
+        host: lab-linux-01
+        event_type: network
+        action: connection_attempt
+        source_ip: 185.220.101.5
+        raw_message: "TCP connection attempt from 185.220.101.5 to lab-linux-01 port 8080"
+        metadata:
+          dst_port: 8080
+          proto: tcp
+
+expected_detections:
+  - CR-NET-001
+
+expected_mitre:
+  - T1046
+
+expected_risk_range:
+  min: 50
+  max: 75

@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#050505] text-white font-sans;
+  }
+
+  /* Custom subtle dark scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #09090b;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1f1f2e;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2d2a45;
+  }
+}
+
+.glass-panel {
+  background: rgba(14, 12, 21, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 20px -5px rgba(244, 114, 182, 0.35);
+}
+
+.glow-red {
+  box-shadow: 0 0 20px -5px rgba(239, 68, 68, 0.45);
+}
+
+.glow-green {
+  box-shadow: 0 0 20px -5px rgba(168, 85, 247, 0.35);
+}
+
+/* Pulse radar effect */
+@keyframes radar-pulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+}
+
+.radar-dot {
+  animation: radar-pulse 2s infinite ease-in-out;
+}

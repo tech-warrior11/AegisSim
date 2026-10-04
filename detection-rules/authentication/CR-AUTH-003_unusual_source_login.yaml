@@ -1,0 +1,28 @@
+id: CR-AUTH-003
+name: Login from Unusual Source IP
+description: Detects successful login events originating from external untrusted IP blocks or unusual geolocation signatures.
+category: authentication
+severity: medium
+enabled: true
+
+mitre_attack:
+  tactic: Initial Access
+  technique_id: T1078
+  technique_name: Valid Accounts
+
+condition:
+  event_type: authentication
+  action: login_success
+  field_match:
+    source_ip_regex: "^(?:198\\.51|203\\.0|185\\.|45\\.|194\\.)"
+
+threshold:
+  count: 1
+  window_minutes: 1
+
+group_by:
+  - source_ip
+  - user
+
+suppression_minutes: 15
+confidence: 0.75

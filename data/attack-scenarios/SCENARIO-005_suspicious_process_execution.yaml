@@ -1,0 +1,58 @@
+id: SCENARIO-005
+name: Suspicious Process Execution & Obfuscation
+description: Simulates an attacker spawning interactive web shells and running base64-encoded command payloads.
+category: endpoint
+author: AegisSim Red Team Simulator
+severity: critical
+
+target:
+  host: lab-web-01
+  service: system
+  target_user: www-data
+  source_ip: 10.10.10.50
+
+stages:
+  - stage_number: 1
+    name: Web Shell Spawn
+    description: Web daemon spawning an interactive bash process
+    events:
+      - source: sysmon
+        host: lab-web-01
+        event_type: endpoint
+        action: process_create
+        user: www-data
+        process: "/bin/bash -i"
+        raw_message: "Process create /bin/bash (PID 21094) spawned by nginx (PID 1024) for user www-data"
+        metadata:
+          parent_process: "nginx"
+          parent_pid: 1024
+          pid: 21094
+
+  - stage_number: 2
+    name: Encoded Payload Execution
+    description: Executing base64 encoded discovery script
+    events:
+      - source: sysmon
+        host: lab-web-01
+        event_type: endpoint
+        action: process_create
+        user: www-data
+        process: "echo aWQ7IHdob2FtaTsgdW5hbWUgLWE= | base64 -d | sh"
+        raw_message: "Process create sh with encoded command pipeline for user www-data"
+        metadata:
+          parent_process: "bash"
+          pid: 21099
+
+expected_detections:
+  - CR-END-002
+  - CR-END-003
+  - CR-END-004
+
+expected_mitre:
+  - T1059
+  - T1059.004
+  - T1027
+
+expected_risk_range:
+  min: 80
+  max: 95

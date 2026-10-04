@@ -1,0 +1,34 @@
+id: CR-PRIV-004
+name: New Privileged User Account Created
+description: Detects useradd, adduser, or usermod commands assigning administrative or sudo privileges.
+category: privilege
+severity: high
+enabled: true
+
+mitre_attack:
+  tactic: Persistence
+  technique_id: T1136
+  technique_name: Create Account
+
+condition:
+  event_type: privilege
+  action: sudo_command
+  pattern_match:
+    fields:
+      - process
+      - raw_message
+    patterns:
+      - "useradd.*-G\\s*(?:sudo|wheel|root|adm)"
+      - "usermod.*-[a-zA-Z]*G\\s*(?:sudo|wheel|root|adm)"
+      - "adduser.*sudo"
+      - "net\\s+localgroup\\s+administrators.*add"
+
+threshold:
+  count: 1
+  window_minutes: 1
+
+group_by:
+  - host
+
+suppression_minutes: 3
+confidence: 0.92

@@ -1,0 +1,38 @@
+id: CR-WEB-002
+name: Cross-Site Scripting (XSS) Pattern Detected
+description: Detects Cross-Site Scripting (XSS) payload indicators such as script tags, event handlers, and javascript pseudo-protocols.
+category: web
+severity: medium
+enabled: true
+
+mitre_attack:
+  tactic: Initial Access
+  technique_id: T1189
+  technique_name: Drive-by Compromise
+
+condition:
+  event_type: web
+  action: http_request
+  pattern_match:
+    fields:
+      - raw_message
+      - metadata.url
+    patterns:
+      - "<script"
+      - "javascript:"
+      - "onerror="
+      - "onload="
+      - "alert\\("
+      - "document\\.cookie"
+      - "eval\\("
+
+threshold:
+  count: 1
+  window_minutes: 1
+
+group_by:
+  - source_ip
+  - host
+
+suppression_minutes: 2
+confidence: 0.88

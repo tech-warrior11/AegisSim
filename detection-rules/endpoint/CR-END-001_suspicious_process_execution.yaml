@@ -1,0 +1,38 @@
+id: CR-END-001
+name: Suspicious Process Execution
+description: Detects execution of known offensive tools or suspicious discovery utilities (mimikatz, certutil abuse, vssadmin, ncat).
+category: endpoint
+severity: high
+enabled: true
+
+mitre_attack:
+  tactic: Execution
+  technique_id: T1059
+  technique_name: Command and Scripting Interpreter
+
+condition:
+  event_type: endpoint
+  action: process_create
+  pattern_match:
+    fields:
+      - process
+      - raw_message
+    patterns:
+      - "mimikatz"
+      - "certutil.*-urlcache"
+      - "vssadmin.*delete.*shadows"
+      - "nc\\s+-[a-zA-Z]*e"
+      - "ncat\\s+-[a-zA-Z]*e"
+      - "curl.*\\|.*sh"
+      - "wget.*\\|.*bash"
+
+threshold:
+  count: 1
+  window_minutes: 1
+
+group_by:
+  - host
+  - user
+
+suppression_minutes: 3
+confidence: 0.94

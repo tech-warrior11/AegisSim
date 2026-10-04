@@ -1,0 +1,53 @@
+id: SCENARIO-001
+name: SSH & Credential Brute Force Simulation
+description: Simulates an automated credential stuffing and brute force attack against a Linux SSH daemon followed by initial access.
+category: authentication
+author: AegisSim Red Team Simulator
+severity: high
+
+target:
+  host: lab-linux-01
+  service: sshd
+  target_user: root
+  source_ip: 10.10.10.50
+
+stages:
+  - stage_number: 1
+    name: Authentication Failures
+    description: Generates rapid failed password attempts
+    events:
+      - source: linux-auth
+        host: lab-linux-01
+        event_type: authentication
+        action: login_failed
+        user: root
+        source_ip: 10.10.10.50
+        raw_message: "Failed password for root from 10.10.10.50 port 41200 ssh2"
+        repeat: 6
+        delay_ms: 100
+
+  - stage_number: 2
+    name: Successful Compromise
+    description: Generates a successful authentication event following brute force
+    events:
+      - source: linux-auth
+        host: lab-linux-01
+        event_type: authentication
+        action: login_success
+        user: root
+        source_ip: 10.10.10.50
+        raw_message: "Accepted password for root from 10.10.10.50 port 41208 ssh2"
+        repeat: 1
+        delay_ms: 200
+
+expected_detections:
+  - CR-AUTH-001
+  - CR-AUTH-002
+
+expected_mitre:
+  - T1110
+  - T1110.001
+
+expected_risk_range:
+  min: 75
+  max: 95

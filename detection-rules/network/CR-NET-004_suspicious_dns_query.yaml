@@ -1,0 +1,37 @@
+id: CR-NET-004
+name: Suspicious DNS Query Pattern (DGA / C2 Indicator)
+description: Detects DNS requests for suspicious top-level domains (.onion, .cc, .top) or high-entropy randomized domain strings indicative of C2.
+category: network
+severity: high
+enabled: true
+
+mitre_attack:
+  tactic: Command and Control
+  technique_id: T1071.004
+  technique_name: DNS
+
+condition:
+  event_type: network
+  action: dns_query
+  pattern_match:
+    fields:
+      - raw_message
+      - metadata.query
+    patterns:
+      - "\\.onion"
+      - "\\.cc$"
+      - "\\.top$"
+      - "\\.xyz$"
+      - "c2[0-9]*\\."
+      - "evil"
+      - "payload"
+
+threshold:
+  count: 1
+  window_minutes: 1
+
+group_by:
+  - host
+
+suppression_minutes: 5
+confidence: 0.86

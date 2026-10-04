@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  web-target:
+    build: ./web-target
+    container_name: lab-web-service
+    ports:
+      - "8080:80"
+    networks:
+      - lab-net
+
+  linux-target:
+    build: ./linux-target
+    container_name: lab-linux-host
+    ports:
+      - "2222:22"
+    networks:
+      - lab-net
+
+networks:
+  lab-net:
+    driver: bridge

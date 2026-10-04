@@ -1,0 +1,38 @@
+id: CR-PRIV-001
+name: Privilege Escalation Indicator
+description: Detects interactive sudo switches, su root executions, or known privesc exploit helpers (pkexec, dirtycow, linpeas).
+category: privilege
+severity: critical
+enabled: true
+
+mitre_attack:
+  tactic: Privilege Escalation
+  technique_id: T1068
+  technique_name: Exploitation for Privilege Escalation
+
+condition:
+  event_type: privilege
+  action: sudo_command
+  pattern_match:
+    fields:
+      - process
+      - raw_message
+    patterns:
+      - "sudo.*su\\s*$"
+      - "sudo.*su\\s*-\\s*root"
+      - "pkexec"
+      - "linpeas"
+      - "gtfobins"
+      - "chmod\\s+[0-7]*s"
+      - "chmod\\s+4755"
+
+threshold:
+  count: 1
+  window_minutes: 1
+
+group_by:
+  - host
+  - user
+
+suppression_minutes: 3
+confidence: 0.95

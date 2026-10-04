@@ -1,0 +1,40 @@
+id: CR-WEB-001
+name: SQL Injection Request Pattern Detected
+description: Detects SQL injection syntax keywords and indicators in HTTP request URLs, parameters, or payloads.
+category: web
+severity: high
+enabled: true
+
+mitre_attack:
+  tactic: Initial Access
+  technique_id: T1190
+  technique_name: Exploit Public-Facing Application
+
+condition:
+  event_type: web
+  action: http_request
+  pattern_match:
+    fields:
+      - raw_message
+      - metadata.url
+    patterns:
+      - "union.*select"
+      - "or.*1=1"
+      - "'\\s*or\\s*'1'='1"
+      - "waitfor\\s+delay"
+      - "sleep\\([0-9]+\\)"
+      - "information_schema"
+      - "benchmark\\("
+      - "--"
+      - "xp_cmdshell"
+
+threshold:
+  count: 1
+  window_minutes: 1
+
+group_by:
+  - source_ip
+  - host
+
+suppression_minutes: 2
+confidence: 0.92

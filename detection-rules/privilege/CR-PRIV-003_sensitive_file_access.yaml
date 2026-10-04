@@ -1,0 +1,38 @@
+id: CR-PRIV-003
+name: Sensitive Shadow / Key File Access Attempt
+description: Detects unauthorized read or dump attempts targeting /etc/shadow, SAM databases, or SSH private keys.
+category: privilege
+severity: critical
+enabled: true
+
+mitre_attack:
+  tactic: Credential Access
+  technique_id: T1003
+  technique_name: OS Credential Dumping
+
+condition:
+  event_type: file
+  action: file_access
+  pattern_match:
+    fields:
+      - raw_message
+      - metadata.target_file
+      - process
+    patterns:
+      - "/etc/shadow"
+      - "id_rsa"
+      - "id_ed25519"
+      - "/etc/security/opasswd"
+      - "SAM"
+      - "SECURITY"
+
+threshold:
+  count: 1
+  window_minutes: 1
+
+group_by:
+  - host
+  - user
+
+suppression_minutes: 3
+confidence: 0.96

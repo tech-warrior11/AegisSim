@@ -1,0 +1,36 @@
+id: CR-END-002
+name: Obfuscated or Encoded Command Execution
+description: Detects process execution utilizing base64 encoding switches, hidden execution flags, or suspicious string decoding.
+category: endpoint
+severity: high
+enabled: true
+
+mitre_attack:
+  tactic: Defense Evasion
+  technique_id: T1027
+  technique_name: Obfuscated Files or Information
+
+condition:
+  event_type: endpoint
+  action: process_create
+  pattern_match:
+    fields:
+      - process
+      - raw_message
+    patterns:
+      - "powershell.*-[eE](?:nc|ncodedCommand)?"
+      - "base64\\s+-d"
+      - "echo.*\\|.*base64.*-d"
+      - "certutil.*-decode"
+      - "python.*-c.*import.*base64"
+
+threshold:
+  count: 1
+  window_minutes: 1
+
+group_by:
+  - host
+  - user
+
+suppression_minutes: 3
+confidence: 0.90

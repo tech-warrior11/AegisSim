@@ -1,0 +1,26 @@
+id: CR-NET-002
+name: Repeated Failed Network Connections (Syn Flood / Probe)
+description: Detects a high volume of rejected or timed-out TCP connections originating from a single source IP.
+category: network
+severity: medium
+enabled: true
+
+mitre_attack:
+  tactic: Impact
+  technique_id: T1498
+  technique_name: Network Denial of Service
+
+condition:
+  event_type: network
+  action: connection_rejected
+
+threshold:
+  count: 10
+  window_minutes: 2
+
+group_by:
+  - source_ip
+  - host
+
+suppression_minutes: 5
+confidence: 0.82

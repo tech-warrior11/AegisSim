@@ -1,0 +1,26 @@
+id: CR-AUTH-001
+name: Multiple Failed Login Attempts
+description: Detects repeated authentication failures from the same source IP or targeted against a single user within a short time window.
+category: authentication
+severity: high
+enabled: true
+
+mitre_attack:
+  tactic: Credential Access
+  technique_id: T1110
+  technique_name: Brute Force
+
+condition:
+  event_type: authentication
+  action: login_failed
+
+threshold:
+  count: 5
+  window_minutes: 5
+
+group_by:
+  - source_ip
+  - user
+
+suppression_minutes: 5
+confidence: 0.85

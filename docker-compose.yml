@@ -1,0 +1,107 @@
+version: '3.8'
+
+services:
+  # AegisSim Backend API Gateway & Detection Engine
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: AegisSim-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - REDIS_URL=redis://redis:6379/0
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://localhost:80
+      - UPLOAD_MAX_MB=25
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - AegisSim-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # AegisSim Frontend React/TypeScript UI
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: AegisSim-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - AegisSim-net
+
+  # Security Data Store (PostgreSQL)
+  postgres:
+    image: postgres:16-alpine
+    container_name: AegisSim-postgres
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - AegisSim-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U AegisSim -d AegisSimdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Event Stream & Correlation Cache (Redis)
+  redis:
+    image: redis:7-alpine
+    container_name: AegisSim-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - AegisSim-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Lab Demo Web Target
+  lab-web:
+    build:
+      context: ./lab/web-target
+      dockerfile: Dockerfile
+    container_name: lab-web-service
+    ports:
+      - "8080:80"
+    networks:
+      - AegisSim-net
+
+  # Lab Demo Linux Target
+  lab-linux:
+    build:
+      context: ./lab/linux-target
+      dockerfile: Dockerfile
+    container_name: lab-linux-host
+    ports:
+      - "2222:22"
+    networks:
+      - AegisSim-net
+
+networks:
+  AegisSim-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

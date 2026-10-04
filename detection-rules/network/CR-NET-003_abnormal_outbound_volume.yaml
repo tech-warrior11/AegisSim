@@ -1,0 +1,30 @@
+id: CR-NET-003
+name: Abnormal Outbound Data Exfiltration Spike
+description: Detects large outbound data volume transfers to external IP destinations.
+category: network
+severity: high
+enabled: true
+
+mitre_attack:
+  tactic: Exfiltration
+  technique_id: T1048
+  technique_name: Exfiltration Over Alternative Protocol
+
+condition:
+  event_type: network
+  action: outbound_flow
+  numeric_filter:
+    field: metadata.bytes_sent
+    operator: ">="
+    value: 5000000
+
+threshold:
+  count: 1
+  window_minutes: 1
+
+group_by:
+  - host
+  - destination_ip
+
+suppression_minutes: 5
+confidence: 0.90

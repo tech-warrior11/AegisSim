@@ -1,0 +1,53 @@
+id: SCENARIO-006
+name: Data Access Anomaly & Exfiltration Spike
+description: Simulates unauthorized sensitive data archive access followed by abnormal high-volume outbound network transfer.
+category: network
+author: AegisSim Red Team Simulator
+severity: high
+
+target:
+  host: lab-linux-01
+  service: system
+  target_user: devuser
+  source_ip: 10.10.10.50
+
+stages:
+  - stage_number: 1
+    name: Sensitive Data Access
+    description: Accessing customer backup archive
+    events:
+      - source: auditd
+        host: lab-linux-01
+        event_type: file
+        action: file_access
+        user: devuser
+        process: "tar -czf /tmp/backup.tar.gz /var/data/customer_records"
+        raw_message: "File access on /var/data/customer_records by tar user devuser"
+        metadata:
+          target_file: "/var/data/customer_records"
+
+  - stage_number: 2
+    name: Outbound Exfiltration Flow
+    description: Large data outbound socket transfer to remote IP
+    events:
+      - source: zeek
+        host: lab-linux-01
+        event_type: network
+        action: outbound_flow
+        destination_ip: 198.51.100.42
+        raw_message: "High volume outbound connection to 198.51.100.42:443 (8420100 bytes)"
+        metadata:
+          bytes_sent: 8420100
+          proto: tcp
+          dst_port: 443
+
+expected_detections:
+  - CR-NET-003
+
+expected_mitre:
+  - T1005
+  - T1048
+
+expected_risk_range:
+  min: 75
+  max: 90

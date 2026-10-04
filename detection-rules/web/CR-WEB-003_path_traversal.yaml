@@ -1,0 +1,38 @@
+id: CR-WEB-003
+name: Directory Path Traversal Attempt
+description: Detects path traversal sequences (dot-dot-slash) and attempts to access sensitive system files via HTTP requests.
+category: web
+severity: high
+enabled: true
+
+mitre_attack:
+  tactic: Discovery
+  technique_id: T1083
+  technique_name: File and Directory Discovery
+
+condition:
+  event_type: web
+  action: http_request
+  pattern_match:
+    fields:
+      - raw_message
+      - metadata.url
+    patterns:
+      - "\\.\\./\\.\\."
+      - "\\.\\.\\\\x5c"
+      - "/etc/passwd"
+      - "/etc/shadow"
+      - "win\\.ini"
+      - "boot\\.ini"
+      - "windows/system32"
+
+threshold:
+  count: 1
+  window_minutes: 1
+
+group_by:
+  - source_ip
+  - host
+
+suppression_minutes: 2
+confidence: 0.90

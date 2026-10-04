@@ -1,0 +1,153 @@
+id: SCENARIO-007
+name: Multi-Stage Advanced Intrusion Simulation
+description: Complete simulated adversary lifecycle inside AegisSim spanning reconnaissance, credential access, web shell execution, local privilege escalation, C2 communication, and data exfiltration.
+category: intrusion
+author: AegisSim Red Team Simulator
+severity: critical
+
+target:
+  host: lab-linux-01
+  service: system
+  target_user: root
+  source_ip: 10.10.10.50
+
+stages:
+  - stage_number: 1
+    name: Reconnaissance & Web Scanning
+    description: Probing for sensitive endpoints and port availability
+    events:
+      - source: nginx
+        host: lab-web-01
+        event_type: web
+        action: http_request
+        source_ip: 10.10.10.50
+        raw_message: '10.10.10.50 - - [29/Sep/2026:10:15:00 +0000] "GET /.env HTTP/1.1" 404 153'
+        metadata:
+          url: "/.env"
+          status_code: 404
+      - source: nginx
+        host: lab-web-01
+        event_type: web
+        action: http_request
+        source_ip: 10.10.10.50
+        raw_message: '10.10.10.50 - - [29/Sep/2026:10:15:02 +0000] "GET /wp-login.php HTTP/1.1" 404 153'
+        metadata:
+          url: "/wp-login.php"
+          status_code: 404
+      - source: nginx
+        host: lab-web-01
+        event_type: web
+        action: http_request
+        source_ip: 10.10.10.50
+        raw_message: '10.10.10.50 - - [29/Sep/2026:10:15:04 +0000] "GET /phpmyadmin HTTP/1.1" 404 153'
+        metadata:
+          url: "/phpmyadmin"
+          status_code: 404
+
+  - stage_number: 2
+    name: Authentication Brute Force & Access
+    description: Multiple failed SSH logins followed by successful entry
+    events:
+      - source: linux-auth
+        host: lab-linux-01
+        event_type: authentication
+        action: login_failed
+        user: admin
+        source_ip: 10.10.10.50
+        raw_message: "Failed password for admin from 10.10.10.50 port 51201 ssh2"
+        repeat: 5
+      - source: linux-auth
+        host: lab-linux-01
+        event_type: authentication
+        action: login_success
+        user: admin
+        source_ip: 10.10.10.50
+        raw_message: "Accepted password for admin from 10.10.10.50 port 51206 ssh2"
+
+  - stage_number: 3
+    name: Web Shell & Obfuscated Execution
+    description: Spawning shell and decoding payloads
+    events:
+      - source: sysmon
+        host: lab-linux-01
+        event_type: endpoint
+        action: process_create
+        user: admin
+        process: "/bin/bash -i"
+        raw_message: "Process create /bin/bash (PID 3302) spawned by sshd user admin"
+        metadata:
+          parent_process: "sshd"
+      - source: sysmon
+        host: lab-linux-01
+        event_type: endpoint
+        action: process_create
+        user: admin
+        process: "echo Y2F0IC9ldGMvc2hhZG93 | base64 -d | sh"
+        raw_message: "Process create sh with encoded pipeline user admin"
+
+  - stage_number: 4
+    name: Privilege Escalation & Credential Access
+    description: Sudo switch and shadow credential harvesting
+    events:
+      - source: auditd
+        host: lab-linux-01
+        event_type: privilege
+        action: sudo_command
+        user: admin
+        process: "sudo su - root"
+        raw_message: "admin : TTY=pts/2 ; PWD=/home/admin ; USER=root ; COMMAND=sudo su - root"
+        metadata:
+          target_user: root
+      - source: auditd
+        host: lab-linux-01
+        event_type: file
+        action: file_access
+        user: root
+        process: "cat /etc/shadow"
+        raw_message: "File access on /etc/shadow by process cat user root"
+        metadata:
+          target_file: "/etc/shadow"
+
+  - stage_number: 5
+    name: C2 DNS Beacon & Outbound Exfiltration
+    description: DNS query to malicious C2 domain and large data flow
+    events:
+      - source: zeek
+        host: lab-linux-01
+        event_type: network
+        action: dns_query
+        raw_message: "DNS standard query A evil-c2-lab.xyz"
+        metadata:
+          query: "evil-c2-lab.xyz"
+      - source: zeek
+        host: lab-linux-01
+        event_type: network
+        action: outbound_flow
+        destination_ip: 10.10.10.50
+        raw_message: "Outbound socket flow to 10.10.10.50:443 (12450000 bytes)"
+        metadata:
+          bytes_sent: 12450000
+
+expected_detections:
+  - CR-WEB-004
+  - CR-AUTH-001
+  - CR-AUTH-002
+  - CR-END-002
+  - CR-PRIV-001
+  - CR-PRIV-003
+  - CR-NET-004
+  - CR-NET-003
+
+expected_mitre:
+  - T1595.002
+  - T1110
+  - T1110.001
+  - T1027
+  - T1068
+  - T1003
+  - T1071.004
+  - T1048
+
+expected_risk_range:
+  min: 88
+  max: 100

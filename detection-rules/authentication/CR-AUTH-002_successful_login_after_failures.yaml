@@ -1,0 +1,26 @@
+id: CR-AUTH-002
+name: Successful Login After Repeated Failures
+description: Detects a successful authentication event preceded by multiple failed login attempts from the same source IP.
+category: authentication
+severity: high
+enabled: true
+
+mitre_attack:
+  tactic: Credential Access
+  technique_id: T1110.001
+  technique_name: Password Guessing
+
+condition:
+  event_type: authentication
+  action: login_success
+  sequence_prior:
+    action: login_failed
+    min_prior_count: 3
+    window_minutes: 10
+
+group_by:
+  - source_ip
+  - user
+
+suppression_minutes: 5
+confidence: 0.90

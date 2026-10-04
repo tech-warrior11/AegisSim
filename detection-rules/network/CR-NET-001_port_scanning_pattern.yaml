@@ -1,0 +1,27 @@
+id: CR-NET-001
+name: Network Port Scanning Pattern Detected
+description: Detects a single external host connecting to multiple distinct destination ports within a short time window.
+category: network
+severity: medium
+enabled: true
+
+mitre_attack:
+  tactic: Discovery
+  technique_id: T1046
+  technique_name: Network Service Scanning
+
+condition:
+  event_type: network
+  action: connection_attempt
+
+threshold:
+  distinct_field: metadata.dst_port
+  distinct_count: 5
+  window_minutes: 2
+
+group_by:
+  - source_ip
+  - host
+
+suppression_minutes: 5
+confidence: 0.88

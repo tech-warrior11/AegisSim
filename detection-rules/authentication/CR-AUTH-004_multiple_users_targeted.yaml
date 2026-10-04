@@ -1,0 +1,26 @@
+id: CR-AUTH-004
+name: Multiple Accounts Targeted From Single IP (Password Spraying)
+description: Detects authentication failures against multiple distinct usernames originating from the same source IP.
+category: authentication
+severity: high
+enabled: true
+
+mitre_attack:
+  tactic: Credential Access
+  technique_id: T1110.003
+  technique_name: Password Spraying
+
+condition:
+  event_type: authentication
+  action: login_failed
+
+threshold:
+  distinct_field: user
+  distinct_count: 3
+  window_minutes: 5
+
+group_by:
+  - source_ip
+
+suppression_minutes: 5
+confidence: 0.88

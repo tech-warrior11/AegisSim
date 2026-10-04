@@ -1,0 +1,36 @@
+id: CR-PRIV-002
+name: Unexpected Administrative Configuration Modification
+description: Detects modification of sudoers files, cron tabs, or authentication PAM modules.
+category: privilege
+severity: high
+enabled: true
+
+mitre_attack:
+  tactic: Persistence
+  technique_id: T1078.003
+  technique_name: Local Accounts
+
+condition:
+  event_type: privilege
+  action: sudo_command
+  pattern_match:
+    fields:
+      - process
+      - raw_message
+    patterns:
+      - "visudo"
+      - "/etc/sudoers"
+      - "/etc/crontab"
+      - "/etc/cron\\.d"
+      - "/etc/pam\\.d"
+
+threshold:
+  count: 1
+  window_minutes: 1
+
+group_by:
+  - host
+  - user
+
+suppression_minutes: 3
+confidence: 0.90

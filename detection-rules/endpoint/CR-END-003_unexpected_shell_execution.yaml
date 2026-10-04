@@ -1,0 +1,37 @@
+id: CR-END-003
+name: Unexpected Interactive Shell Spawned by Web Service
+description: Detects interactive shells (/bin/sh, /bin/bash, /bin/zsh) executed by service accounts such as www-data, nginx, or apache.
+category: endpoint
+severity: critical
+enabled: true
+
+mitre_attack:
+  tactic: Execution
+  technique_id: T1059.004
+  technique_name: Unix Shell
+
+condition:
+  event_type: endpoint
+  action: process_create
+  pattern_match:
+    fields:
+      - process
+    patterns:
+      - "/bin/sh"
+      - "/bin/bash"
+      - "/bin/dash"
+      - "cmd\\.exe"
+      - "powershell\\.exe"
+  field_match:
+    user_regex: "^(?:www-data|nginx|apache|httpd|nobody)$"
+
+threshold:
+  count: 1
+  window_minutes: 1
+
+group_by:
+  - host
+  - user
+
+suppression_minutes: 3
+confidence: 0.96

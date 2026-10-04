@@ -1,0 +1,36 @@
+id: CR-END-004
+name: Suspicious Web Server Parent-Child Process Spawn
+description: Detects command shells or interpreters launched directly by web servers or database daemons.
+category: endpoint
+severity: critical
+enabled: true
+
+mitre_attack:
+  tactic: Execution
+  technique_id: T1059
+  technique_name: Command and Scripting Interpreter
+
+condition:
+  event_type: endpoint
+  action: process_create
+  pattern_match:
+    fields:
+      - metadata.parent_process
+    patterns:
+      - "nginx"
+      - "apache2"
+      - "httpd"
+      - "gunicorn"
+      - "uvicorn"
+      - "postgres"
+      - "mysqld"
+
+threshold:
+  count: 1
+  window_minutes: 1
+
+group_by:
+  - host
+
+suppression_minutes: 3
+confidence: 0.95

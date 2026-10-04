@@ -1,0 +1,53 @@
+id: SCENARIO-004
+name: Linux Host Privilege Escalation Simulation
+description: Simulates local privilege escalation attempts via sudo abuse and sensitive shadow file harvesting.
+category: privilege
+author: AegisSim Red Team Simulator
+severity: critical
+
+target:
+  host: lab-linux-01
+  service: system
+  target_user: devuser
+  source_ip: 10.10.10.50
+
+stages:
+  - stage_number: 1
+    name: Sudo Privilege Switch
+    description: Executing sudo su without authorization
+    events:
+      - source: auditd
+        host: lab-linux-01
+        event_type: privilege
+        action: sudo_command
+        user: devuser
+        process: "sudo su - root"
+        raw_message: "devuser : TTY=pts/1 ; PWD=/home/devuser ; USER=root ; COMMAND=sudo su - root"
+        metadata:
+          target_user: root
+
+  - stage_number: 2
+    name: Credential Harvesting
+    description: Attempting to dump /etc/shadow
+    events:
+      - source: auditd
+        host: lab-linux-01
+        event_type: file
+        action: file_access
+        user: devuser
+        process: "cat /etc/shadow"
+        raw_message: "File access attempt on /etc/shadow by process cat (PID 14920) user devuser"
+        metadata:
+          target_file: "/etc/shadow"
+
+expected_detections:
+  - CR-PRIV-001
+  - CR-PRIV-003
+
+expected_mitre:
+  - T1068
+  - T1003
+
+expected_risk_range:
+  min: 80
+  max: 95

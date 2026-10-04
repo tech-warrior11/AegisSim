@@ -1,0 +1,78 @@
+{
+  "ips": {
+    "10.10.10.50": {
+      "reputation": "MALICIOUS",
+      "threat_actor": "APT-SIM-LAB",
+      "tags": ["brute_force", "scanner", "c2_attacker"],
+      "confidence": 0.95,
+      "description": "Simulated adversary reconnaissance and brute force origin IP in AegisSim."
+    },
+    "185.220.101.5": {
+      "reputation": "MALICIOUS",
+      "threat_actor": "TOR-EXIT-NODE",
+      "tags": ["anonymizer", "tor_exit"],
+      "confidence": 0.90,
+      "description": "Known synthetic Tor exit node used for evasion simulation."
+    },
+    "198.51.100.42": {
+      "reputation": "SUSPICIOUS",
+      "threat_actor": "UNKNOWN-SCANNER",
+      "tags": ["web_scraper", "fuzzer"],
+      "confidence": 0.75,
+      "description": "Automated vulnerability probing IP observed targeting web ports."
+    },
+    "8.8.8.8": {
+      "reputation": "CLEAN",
+      "threat_actor": "Google LLC",
+      "tags": ["public_dns", "resolver"],
+      "confidence": 1.0,
+      "description": "Legitimate Google Public DNS resolver."
+    },
+    "1.1.1.1": {
+      "reputation": "CLEAN",
+      "threat_actor": "Cloudflare Inc.",
+      "tags": ["public_dns", "resolver"],
+      "confidence": 1.0,
+      "description": "Legitimate Cloudflare Public DNS resolver."
+    }
+  },
+  "domains": {
+    "evil-c2-lab.xyz": {
+      "reputation": "MALICIOUS",
+      "threat_actor": "APT-SIM-LAB",
+      "tags": ["c2_domain", "data_exfil"],
+      "confidence": 0.95,
+      "description": "Simulated command and control payload staging domain."
+    },
+    "cryptominer-payload.cc": {
+      "reputation": "MALICIOUS",
+      "threat_actor": "CRYPTOJACKER",
+      "tags": ["miner", "staging"],
+      "confidence": 0.90,
+      "description": "Synthetic miner download endpoint."
+    }
+  },
+  "hashes": {
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855": {
+      "reputation": "CLEAN",
+      "threat_actor": "N/A",
+      "tags": ["empty_file"],
+      "confidence": 1.0,
+      "description": "SHA-256 hash of an empty file."
+    },
+    "5d41402abc4b2a76b9719d911017c592": {
+      "reputation": "SUSPICIOUS",
+      "threat_actor": "PASSWORD_CRACKER",
+      "tags": ["common_hash", "hello_world"],
+      "confidence": 0.6,
+      "description": "Well-known test MD5 hash."
+    },
+    "44d88612fea8a8f36de82e1278abb02f": {
+      "reputation": "MALICIOUS",
+      "threat_actor": "MIMIKATZ-SIM",
+      "tags": ["lsass_dumper", "credential_theft"],
+      "confidence": 0.99,
+      "description": "Synthetic hash associated with LSASS credential dumping utility."
+    }
+  }
+}

@@ -1,0 +1,30 @@
+id: CR-WEB-005
+name: High-Volume HTTP Client Errors (Web Scan / Fuzzing)
+description: Detects a surge of 4xx client errors (404 Not Found, 403 Forbidden) from a single IP, indicating automated web fuzzing.
+category: web
+severity: medium
+enabled: true
+
+mitre_attack:
+  tactic: Reconnaissance
+  technique_id: T1595
+  technique_name: Active Scanning
+
+condition:
+  event_type: web
+  action: http_request
+  numeric_filter:
+    field: metadata.status_code
+    operator: ">="
+    value: 400
+
+threshold:
+  count: 8
+  window_minutes: 3
+
+group_by:
+  - source_ip
+  - host
+
+suppression_minutes: 5
+confidence: 0.80
