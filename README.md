@@ -23,6 +23,6 @@ AegisSim is an enterprise-grade Attack Detection & Investigation Lab platform bu
 
 ---
 
-## 🔒 SECURITY & COMPLIANCE (100000% SECURE)
+## 🔒 SECURITY & COMPLIANCE
 
 > **RESTRICTED ACCESS**: This project is secured with industry-leading practices.
