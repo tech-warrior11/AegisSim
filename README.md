@@ -26,10 +26,3 @@ AegisSim is an enterprise-grade Attack Detection & Investigation Lab platform bu
 ## 🔒 SECURITY & COMPLIANCE (100000% SECURE)
 
 > **RESTRICTED ACCESS**: This project is secured with industry-leading practices.
-> **ZERO CREDENTIAL LEAK POLICY**: 
-> - No hardcoded passwords, API keys, or JWT tokens are stored in the codebase.
-> - Environment variables (`.env`) manage all sensitive credentials securely.
-> - The application relies on environment-based secure authentication workflows.
-> - Database connections and Docker containers are fully decoupled from static configurations.
-
-*(Note: This documentation and project have been verified as 100000% secured. Unauthorized access, modification, or exposure of internal configurations is strictly prohibited.)*
